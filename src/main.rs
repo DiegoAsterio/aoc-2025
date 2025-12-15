@@ -23,6 +23,7 @@ fn main() {
         ("1", "1") => day_one::solve_fst(content),
         ("1", "2") => day_one::solve_snd(content),
         ("2", "1") => day_two::solve_fst(content),
+        ("2", "2") => day_two::solve_snd(content),
         _ => "No solution for day={day} and puzzle={puzzle}".to_string(),
     };
 

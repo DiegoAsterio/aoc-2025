@@ -1,9 +1,14 @@
-pub fn decode_content_into_puzzle_input(content: String){
+fn decode_content_into_puzzle_input(content: String) -> Vec<(i64, i64)>{
     let ranges = content.trim().split(",");
-    ranges.map()
+    ranges.map(|x| {
+        let mut ys = x.trim().split("-");
+        let y0 = ys.next().expect("No first item found").parse::<i64>().expect("Failed to parse into integer.");
+        let y1 = ys.next().expect("No second item found").parse::<i64>().expect("Failed to parse into integer.");
+        (y0, y1)
+    }).collect()
 }
 
-pub fn is_valid_id(id: i32) -> bool{
+fn is_valid_id(id: i64) ->  bool{
     let id = id.to_string();
     let length = id.len();
 
@@ -21,9 +26,61 @@ pub fn is_valid_id(id: i32) -> bool{
 }
 
 pub fn solve_fst(content: String) -> String {
-    "1227775554".to_string()
+    let mut ret = 0;
+    for (y0, y1) in decode_content_into_puzzle_input(content) {
+        for y in y0..y1+1 {
+            if !is_valid_id(y){
+                ret += y;
+            }
+        }
+    }
+    ret.to_string()
 }
 
+fn can_build_id_by_concatenating_seq(id: &str, seq: &str) -> bool{
+    let id_chars: Vec<char> = id.chars().collect();
+    let seq_chars: Vec<char> = seq.chars().collect();
+
+    let len_id = id.len();
+    let len_chars = seq.len();
+        
+    if !len_id.is_multiple_of(len_chars){
+        false
+    } else {
+        for i in 0..len_id {
+            if id_chars[i] != seq_chars[i%len_chars] {
+                return false
+            }
+        }
+        true
+    }
+}
+
+fn contains_repeated_sequence(id: i64) -> bool{
+    let id = id.to_string();
+    let length = id.len();
+
+    for r in 1..(length/2)+1 {
+        let seq = &id[..r];
+        if can_build_id_by_concatenating_seq(&id, seq) {
+            return true
+        }
+        
+    }    
+    false
+}
+
+pub fn solve_snd(content: String) -> String {
+    let mut ret = 0;
+    for (y0, y1) in decode_content_into_puzzle_input(content) {
+        for y in y0..y1+1 {
+            if contains_repeated_sequence(y){
+                ret += y;
+            }
+        }
+    }
+    ret.to_string()
+}
 
 #[cfg(test)]
 mod tests {
@@ -54,4 +111,31 @@ mod tests {
         let result = is_valid_id(55);
         assert!(!result);
     }
+
+    #[test]
+    fn snd_passess_input_sample(){
+        let result = solve_snd("11-22,95-115,998-1012,1188511880-1188511890,222220-222224,
+1698522-1698528,446443-446449,38593856-38593862,565653-565659,
+824824821-824824827,2121212118-2121212124".to_string());
+        assert_eq!(result, "4174379265")
+    }
+
+    #[test]
+    fn valid_id_for_snd_exercise(){
+        let result = contains_repeated_sequence(12);
+        assert!(!result);
+    }
+
+    #[test]
+    fn invalid_id_repeats_two_sequences(){
+        let result = contains_repeated_sequence(11);
+        assert!(result)
+    }
+
+    #[test]
+    fn invalid_id_repeats_three_sequences(){
+        let result = contains_repeated_sequence(121212);
+        assert!(result)
+    }
+
 }
