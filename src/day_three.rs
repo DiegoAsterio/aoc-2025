@@ -9,16 +9,24 @@ fn parse_content_into_puzzle_input(content: String) -> Vec<Vec<u32>> {
     }).collect()
 }
 
+fn index_to_leftmost_biggest_digit(xs: &[u32]) -> usize {
+    let range_size = xs.len();
+
+    let steps_back_from_the_end_to_the_fst_biggest_digit = xs.iter().rev().position_max().unwrap();
+    let last_index = range_size - 1;
+
+    last_index - steps_back_from_the_end_to_the_fst_biggest_digit
+}
+
 fn calculate_largest_joltage(battery: &Vec<u32>) -> u32 {
     let length_battery = battery.len();
     let range_to_find_fst_digit = &battery[..length_battery-1];
 
-    // TODO: fix error: If several elements are equally maximum, the position of the last of them is returned.
-    let first_digit_index = range_to_find_fst_digit.iter().position_max().unwrap();
+    let first_digit_index = index_to_leftmost_biggest_digit(range_to_find_fst_digit);
 
     let range_to_find_snd_digit = &battery[first_digit_index+1..length_battery];
 
-    let second_digit_index = first_digit_index + 1 + range_to_find_snd_digit.iter().position_max().unwrap();
+    let second_digit_index = first_digit_index + 1 + index_to_leftmost_biggest_digit(range_to_find_snd_digit);
 
     10 * battery[first_digit_index] + battery[second_digit_index]
 }
@@ -27,7 +35,6 @@ pub fn solve_fst(content: String) -> String {
     let batteries = parse_content_into_puzzle_input(content);
 
     let joltages: Vec<u32> = batteries.iter().map(calculate_largest_joltage).collect();
-    dbg!(&joltages);
     joltages.iter().sum::<u32>().to_string()
 }
 
