@@ -1,3 +1,7 @@
+use crate::extract::input::PuzzleInput;
+
+use super::output::PuzzleOutput;
+
 fn parse_content_to_puzzle_input(content: String) -> Vec<Movement>{
     let lines = content.lines();
     lines.map(Movement::new).collect()
@@ -86,7 +90,7 @@ fn zeroes_between_safe_positions(prev_safe: &Safe, curr_safe: &Safe) -> i32{
     response
 }
 
-pub fn solve_fst(content: String) -> String{
+fn solve_fst(content: String) -> PuzzleOutput {
     let mut safe = Safe::new();
     let movements = parse_content_to_puzzle_input(content);
 
@@ -99,10 +103,10 @@ pub fn solve_fst(content: String) -> String{
         }
     }
 
-    response.to_string()
+    PuzzleOutput { result: response.to_string() }
 }
 
-pub fn solve_snd(content: String) -> String{
+fn solve_snd(content: String) -> PuzzleOutput {
     let mut curr_safe_position = Safe::new();
     let movements = parse_content_to_puzzle_input(content);
 
@@ -118,5 +122,21 @@ pub fn solve_snd(content: String) -> String{
         );
     }
 
-    response.to_string()
+    PuzzleOutput { result: response.to_string() }
+}
+
+pub fn solve(input: &PuzzleInput) -> Result<PuzzleOutput, String> {
+    match input {
+        PuzzleInput {
+            day: 1,
+            iteration: 1,
+            text
+        } => Ok(solve_fst(text.to_string())),
+        PuzzleInput {
+            day: 1,
+            iteration: 2,
+            text
+        } => Ok(solve_snd(text.to_string())),
+        _ => Err("Incorrect Puzzle Input".to_string())
+    }
 }

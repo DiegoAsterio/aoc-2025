@@ -1,5 +1,9 @@
 use itertools::Itertools;
 
+use crate::extract::input::PuzzleInput;
+
+use super::output::PuzzleOutput;
+
 fn parse_content_into_puzzle_input(content: String) -> Vec<Vec<u32>> {
     const RADIX: u32 = 10;
     let lines  = content.lines();
@@ -35,20 +39,41 @@ fn calculate_largest_joltage_with_n_batteries(bank: &Vec<u32>, n: usize) -> u64 
     joltage
 }
 
-pub fn solve_for_n_batteries_turned_on(content: String, n: usize) -> String {
+fn solve_for_n_batteries_turned_on(content: String, n: usize) -> String {
     let batteries = parse_content_into_puzzle_input(content);
 
     let joltages: Vec<u64> = batteries.iter().map(|x| calculate_largest_joltage_with_n_batteries(x, n)).collect();
     joltages.iter().sum::<u64>().to_string()
 }
 
-pub fn solve_fst(content: String) -> String {
-    solve_for_n_batteries_turned_on(content, 2)
+fn solve_fst(content: String) -> PuzzleOutput {
+    PuzzleOutput {
+        result: solve_for_n_batteries_turned_on(content, 2) 
+    }
 }
 
-pub fn solve_snd(content: String) -> String {
-    solve_for_n_batteries_turned_on(content, 12)
+fn solve_snd(content: String) -> PuzzleOutput {
+    PuzzleOutput{
+        result: solve_for_n_batteries_turned_on(content, 12)
+    }
 }
+
+pub fn solve(input: &PuzzleInput) -> Result<PuzzleOutput, String> {
+    match input {
+        PuzzleInput {
+            day: 3,
+            iteration: 1,
+            text
+        } => Ok(solve_fst(text.to_string())),
+        PuzzleInput {
+            day: 3,
+            iteration: 2,
+            text
+        } => Ok(solve_snd(text.to_string())),
+        _ => Err("Incorrect Puzzle Input".to_string())
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -57,7 +82,7 @@ mod tests {
     #[test]
     fn fst_passes_input_example(){
         let result = solve_fst("987654321111111\n811111111111119\n234234234234278\n818181911112111".to_string());
-        assert_eq!(result, "357".to_string());
+        assert_eq!(result.result, "357".to_string());
     }
 
     #[test]
@@ -91,7 +116,7 @@ mod tests {
     #[test]
     fn snd_passes_input_example(){
         let result = solve_snd("987654321111111\n811111111111119\n234234234234278\n818181911112111".to_string());
-        assert_eq!(result, "3121910778619".to_string());
+        assert_eq!(result.result, "3121910778619".to_string());
     }
 
     #[test]

@@ -1,34 +1,27 @@
-use std::env;
-use std::fs;
+use std::{env, process};
 
-mod day_one;
-mod day_two;
-mod day_three;
-
-fn get_content_from_file(file_path: String) -> String{
-    println!("Reading file path: {file_path}");
-    fs::read_to_string(file_path)
-        .expect("Error reading file.")
-}
-
+use aoc_2025::{extract::{config::Config, input::PuzzleInput}, transform::day};
 
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    let day = &args[1];
-    let puzzle = &args[2];
+    // Extract
+    let config = Config::new(&args).unwrap_or_else(|err| {
+        println!("Could not parse arguments into valid input: {err}");
+        process::exit(1);
+    });
 
-    let content = get_content_from_file(format!("./data/day/{day}/input"));
+    let input = PuzzleInput::new(&config).unwrap_or_else(|err| {
+        println!("Unable to correctly read input: {err}");
+        process::exit(1);
+    });
 
-    let response = match (day.as_str(), puzzle.as_str()) {
-        ("1", "1") => day_one::solve_fst(content),
-        ("1", "2") => day_one::solve_snd(content),
-        ("2", "1") => day_two::solve_fst(content),
-        ("2", "2") => day_two::solve_snd(content),
-        ("3", "1") => day_three::solve_fst(content),
-        ("3", "2") => day_three::solve_snd(content),
-        _ => "No solution for day={day} and puzzle={puzzle}".to_string(),
-    };
+    // Transform
+    let solution = day::solve_puzzle(&input).unwrap_or_else(|err| {
+        println!("Unable to correctly process the input: {err}");
+        process::exit(1);
+    });
 
-    println!("The code for the elves is: {response}")
+    // Load (TODO: maybe update the value to AOC directly)
+    println!("The code for the elves is: {}", solution.result)
 }
