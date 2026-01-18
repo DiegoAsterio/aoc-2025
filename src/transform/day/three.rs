@@ -1,8 +1,6 @@
 use itertools::Itertools;
 
-use crate::extract::input::PuzzleInput;
-
-use super::output::PuzzleOutput;
+use crate::{extract::input::PuzzleInput, load::output::PuzzleOutput};
 
 fn parse_content_into_puzzle_input(content: String) -> Vec<Vec<u32>> {
     const RADIX: u32 = 10;

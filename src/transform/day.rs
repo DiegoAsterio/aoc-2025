@@ -1,11 +1,10 @@
-use crate::extract::input::PuzzleInput;
+use crate::{extract::input::PuzzleInput, load::output::PuzzleOutput};
 
-mod output;
 mod one;
 mod two;
 mod three;
 
-pub fn solve_puzzle(input: &PuzzleInput) -> Result<output::PuzzleOutput, String> {
+pub fn solve_puzzle(input: &PuzzleInput) -> Result<PuzzleOutput, String> {
     match input.day {
         1 => one::solve(input),
         2 => two::solve(input),

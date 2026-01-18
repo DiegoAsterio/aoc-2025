@@ -1,6 +1,4 @@
-use crate::extract::input::PuzzleInput;
-
-use super::output::PuzzleOutput;
+use crate::{extract::input::PuzzleInput, load::output::PuzzleOutput};
 
 fn parse_content_to_puzzle_input(content: String) -> Vec<Movement>{
     let lines = content.lines();

@@ -1,6 +1,4 @@
-use crate::extract::input::PuzzleInput;
-
-use super::output::PuzzleOutput;
+use crate::{extract::input::PuzzleInput, load::output::PuzzleOutput};
 
 fn decode_content_into_puzzle_input(content: String) -> Vec<(i64, i64)>{
     let ranges = content.trim().split(",");

@@ -23,5 +23,5 @@ fn main() {
     });
 
     // Load (TODO: maybe update the value to AOC directly)
-    println!("The code for the elves is: {}", solution.result)
+    solution.show();
 }
