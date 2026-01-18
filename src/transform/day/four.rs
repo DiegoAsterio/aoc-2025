@@ -40,27 +40,64 @@ fn surrounding_papers_count(content: &Vec<Vec<Cell>>, row_index: usize, col_inde
     count
 }
 
-fn solve_fst(content: String) -> String {
-    let plan = parse_content_into_grid(content);
+fn get_papers_that_can_be_moved(plan: &Vec<Vec<Cell>>) -> Vec<(usize, usize)> {
+    let mut list_of_positions: Vec<(usize, usize)> = vec![];
 
-    let mut count = 0;
     for (i, row) in  plan.iter().enumerate() {
         for (j, cell) in row.iter().enumerate(){
             if let Cell::Paper = cell && surrounding_papers_count(&plan, i, j) < 4{
-                count += 1;
+                list_of_positions.push((i,j));
             }
         }
     }
-    format!("{}", count)
+
+    list_of_positions
+}
+
+fn remove_paper(plan: &mut Vec<Vec<Cell>>, positions: &Vec<(usize,usize)>) -> () {
+    for (i, j) in positions {
+        plan[*i][*j] = Cell::Empty;
+    }
+}
+
+fn solve_fst(content: String) -> String {
+    let plan = parse_content_into_grid(content);
+
+    format!("{}", get_papers_that_can_be_moved(&plan).len())
+}
+
+fn solve_snd(content: String) -> String {
+    let mut total_papers_moved = 0;
+    let mut plan = parse_content_into_grid(content);
+    
+    loop {
+        let changes: Vec<(usize, usize)> = get_papers_that_can_be_moved(&plan);
+
+        remove_paper(&mut plan, &changes);
+
+        if changes.len() == 0 {
+            break;
+        }
+        else {
+            total_papers_moved += changes.len();
+        }
+    }
+
+    format!("{}", total_papers_moved)
 }
 
 pub fn solve(input: &PuzzleInput) -> Result<PuzzleOutput, String> {
     match input {
         PuzzleInput{
-            day: 4,
             iteration: 1,
-            text
+            text,
+            ..
         } => Ok(PuzzleOutput{result: solve_fst(text.to_string())}),
+        PuzzleInput{
+            iteration: 2,
+            text,
+            ..
+        } => Ok(PuzzleOutput{result: solve_snd(text.to_string())}),
         _ => Err("Incorrect Puzzle Input".to_string())
     }
 } 
@@ -73,5 +110,11 @@ mod tests {
     fn fst_passes_input_example(){
         let result = solve_fst("..@@.@@@@.\n@@@.@.@.@@\n@@@@@.@.@@\n@.@@@@..@.\n@@.@@@@.@@\n.@@@@@@@.@\n.@.@.@.@@@\n@.@@@.@@@@\n.@@@@@@@@.\n@.@.@@@.@.".to_string());
         assert_eq!(result, "13");
+    }
+
+    #[test]
+    fn snd_passes_input_example(){
+        let result = solve_snd("..@@.@@@@.\n@@@.@.@.@@\n@@@@@.@.@@\n@.@@@@..@.\n@@.@@@@.@@\n.@@@@@@@.@\n.@.@.@.@@@\n@.@@@.@@@@\n.@@@@@@@@.\n@.@.@@@.@.".to_string());
+        assert_eq!(result, "43");
     }
 }
