@@ -71,6 +71,17 @@ impl FreshnessChecker {
             Err(idx) => idx % 2 == 1,
         }
     }
+
+    fn count_fresh_ids(&self) -> i64 {
+        let mut iter = self.fresh_ranges.chunks_exact(2);
+        let count = iter.clone().map(|v| {v[1] - v[0] + 1}).sum();
+
+        if !iter.remainder().is_empty() {
+            panic!("Incorrect number of fresh ranges; it should be even.");
+        }
+        
+        count
+    }
 }
 
 fn decode_content_into_puzzle_input(content: String) -> (Vec<(i64,i64)>, Vec<i64>){
@@ -100,6 +111,16 @@ fn solve_fst(content: String) -> String {
     count.to_string()
 }
 
+fn solve_snd(content: String) -> String {
+    let (fresh_ingredients_ranges, _) = decode_content_into_puzzle_input(content);
+
+    let checker = FreshnessChecker::new(&fresh_ingredients_ranges);
+
+    let count = checker.count_fresh_ids();
+
+    count.to_string()
+}
+
 pub fn solve(input: &PuzzleInput) -> Result<PuzzleOutput, String> {
     match input {
         PuzzleInput{
@@ -107,6 +128,11 @@ pub fn solve(input: &PuzzleInput) -> Result<PuzzleOutput, String> {
             text,
             ..
         } => Ok(PuzzleOutput{result: solve_fst(text.to_string())}),
+        PuzzleInput{
+            iteration: 2,
+            text,
+            ..
+        } => Ok(PuzzleOutput{result: solve_snd(text.to_string())}),
         _ => Err("Incorrect Puzzle Input".to_string())
     }
 } 
