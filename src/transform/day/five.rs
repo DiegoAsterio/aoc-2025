@@ -15,11 +15,12 @@ impl FreshnessChecker {
         ret
     }
 
-    /// The ranges of fresh ingredients are added ot the internal fresh_range
-    /// vector. If any two intervals have empty intersection we perform a merge.
+    /// The ranges of fresh ingredients are added to the internal fresh_range
+    /// vector. If any two intervals have non-empty intersection we perform a merge.
     ///
     /// The resulting fresh_ranges vector is a vector of even length. Where every
-    /// two values theres the beggining and the end of two given intervals.
+    /// two values are the beggining and the end of two given intervals. Intervals
+    /// are sorted from left to right.
     fn initialize(&mut self, fresh_ingredients_ranges: &Vec<(i64, i64)>) {
         for (l, r) in fresh_ingredients_ranges.iter() {
             let mut l_idx = self.fresh_ranges.partition_point(|&x| { x < *l });
@@ -28,18 +29,27 @@ impl FreshnessChecker {
             let is_right_merge_required = r_idx%2 == 1;
 
             if is_left_merge_required {
+                // If we need to merge the beggining of the interval left is now
+                // the previous left i.e. the value in index: l_idx - 1.
                 l_idx -= 1;
             }
             else {
+                // In other case we insert it between two intervals.
                 self.fresh_ranges.insert(l_idx, *l);
+                // Every value after l_idx is now one additional position left.
                 r_idx += 1;
             }
 
+
+            // if right merge is required we now have whatever is in r_idx as the new r.
+
+            // In other case (!is_right_merge_required) we insert it between two intervals.
             if !is_right_merge_required {
                 self.fresh_ranges.insert(r_idx, *r);
             }
 
-            // merging section
+            // Lastly we have a new interval that is [fresh_ranges[l], fresh_ranges[r]] any
+            // value in between needs to be removed.
             while l_idx + 1 < r_idx {
                 self.fresh_ranges.remove(l_idx + 1);
                 r_idx -= 1;
