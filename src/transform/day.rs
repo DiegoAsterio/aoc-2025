@@ -5,6 +5,7 @@ mod two;
 mod three;
 mod four;
 mod five;
+mod six;
 
 pub fn solve_puzzle(input: &PuzzleInput) -> Result<PuzzleOutput, String> {
     match input.day {
@@ -13,6 +14,7 @@ pub fn solve_puzzle(input: &PuzzleInput) -> Result<PuzzleOutput, String> {
         3 => three::solve(input),
         4 => four::solve(input),
         5 => five::solve(input),
+        6 => six::solve(input),
         n => Err(format!("No solution available for day {number}", number=n).to_string())
     }
 }

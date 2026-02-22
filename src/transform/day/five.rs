@@ -73,7 +73,7 @@ impl FreshnessChecker {
     }
 
     fn count_fresh_ids(&self) -> i64 {
-        let mut iter = self.fresh_ranges.chunks_exact(2);
+        let iter = self.fresh_ranges.chunks_exact(2);
         let count = iter.clone().map(|v| {v[1] - v[0] + 1}).sum();
 
         if !iter.remainder().is_empty() {
