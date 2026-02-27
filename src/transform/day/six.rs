@@ -19,6 +19,19 @@ fn transpose<T>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
         .collect()
 }
 
+fn read_from_r_to_l_in_columns<T>(v: Vec<Vec<T>>) -> Vec<T> {
+    assert!(!v.is_empty());
+    let len = v[0].len();
+    let mut iters: Vec<_> = v.into_iter().map(|n| n.into_iter().rev()).collect();
+    (0..len)
+        .map(|_| {
+            iters
+                .iter_mut()
+                .map(|n| n.next().unwrap())
+                .collect::<Vec<T>>()
+        }).flatten().collect()
+}
+
 fn decode_content_into_puzzle_input(content: String) -> Vec<(String,Vec<i64>)> {
     let mut iter = content.trim().rsplit("\n");
 
@@ -38,6 +51,34 @@ fn decode_content_into_puzzle_input(content: String) -> Vec<(String,Vec<i64>)> {
     iter::zip(operations, t_values).collect()
 }
 
+fn transform_to_problem_input(content: &str) -> (String, Vec<i64>) {
+    let operation = content.chars().last().expect("The input content had less than 1 character.");
+        
+    let values = content.trim_matches('*').trim_matches('+').split_whitespace()
+                          .map(|y| {
+                              i64::from_str(y)
+                                  .expect("Error casting values different from whitespace to integers.")
+                          }).collect();
+    (operation.to_string(), values)
+}
+
+fn decode_content_into_puzzle_input_snd(content: String) -> Vec<(String, Vec<i64>)> {
+    let lines: Vec<Vec<char>> = content
+                    .lines()
+                        .map( |l| {
+                            l.chars().collect()
+                        }).collect();
+
+    let num_lines = lines.len();
+    let content: String = read_from_r_to_l_in_columns(lines).into_iter().collect();
+
+    let separator_value = std::iter::repeat(" ").take(num_lines).collect::<String>();
+    
+    let problem_lines = content.split(&separator_value);
+
+    problem_lines.map(|l| transform_to_problem_input(l)).collect()
+}
+
 fn solve_problem(operation: &str, values: Vec<i64>) -> i64{
     match operation {
         "+" => values.into_iter().sum(),
@@ -51,6 +92,11 @@ fn solve_fst(content: String) -> String {
     problems.into_iter().map(|(operation, values)| {solve_problem(&operation, values)}).sum::<i64>().to_string()
 }
 
+fn solve_snd(content: String) -> String {
+    let problems = decode_content_into_puzzle_input_snd(content);
+    problems.into_iter().map(|(operation, values)| {solve_problem(&operation, values)}).sum::<i64>().to_string()
+}
+
 pub fn solve(input: &PuzzleInput) -> Result<PuzzleOutput, String> {
     match input {
         PuzzleInput{
@@ -58,6 +104,11 @@ pub fn solve(input: &PuzzleInput) -> Result<PuzzleOutput, String> {
             text,
             ..
         } => Ok(PuzzleOutput{result: solve_fst(text.to_string())}),
+        PuzzleInput{
+            iteration: 2,
+            text,
+            ..
+        } => Ok(PuzzleOutput{result: solve_snd(text.to_string())}),
         _ => Err("Incorrect Puzzle Input".to_string())
     }
 } 
